@@ -1,16 +1,11 @@
-const { SlashCommandBuilder } = require('discord.js');
-
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('ping')
-    .setDescription('Botun gecikme suresini gosterir'),
-
-  async execute(interaction) {
+  data: { name: 'ping', description: 'Botun gecikme süresini gösterir' },
+  async execute(message, args) {
     const baslangic = Date.now();
-    await interaction.reply('Hesaplaniyor...');
+    const msg = await message.reply('Hesaplanıyor...');
     const gecikme = Date.now() - baslangic;
-    await interaction.editReply(
-      `🏓 Pong! Gecikme: **${gecikme}ms** | API: **${Math.round(interaction.client.ws.ping)}ms**`
+    await msg.edit(
+      `🏓 Pong! Mesaj Gecikmesi: **${gecikme}ms** | API: **${Math.round(message.client.ws.ping)}ms**`
     );
   },
 };

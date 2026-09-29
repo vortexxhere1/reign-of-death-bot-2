@@ -1,23 +1,43 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('yardim')
-    .setDescription('Kullanilabilir tum komutlari listeler'),
+  data: { 
+    name: 'yardim', 
+    description: 'Botun interaktif komut ve yönetim dashboard menüsünü açar' 
+  },
+  async execute(message, args) {
+    const komutlar = message.client.commands;
+    
+    const komutListesi = komutlar
+      .map((komut) => `🔹 **!${komut.data.name}**\n┗ 📝 *${komut.data.description || 'Açıklama bulunmuyor'}*`)
+      .join('\n\n');
 
-  async execute(interaction) {
-    // client.commands Collection'i index.js icinde tum komutlari otomatik
-    // topluyor, o yuzden buraya yeni komut eklendiginde bu liste kendiliginden guncellenir
-    const komutlar = interaction.client.commands
-      .map((komut) => `**/${komut.data.name}** — ${komut.data.description}`)
-      .join('\n');
+    const dashboardEmbed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setTitle('📊 Bot Komut & Yönetim Dashboard')
+      .setDescription(
+        `Merhaba **${message.author.username}**! Aşağıda bu sunucuda kullanabileceğin tüm komutların listesi yer almaktadır.\n\n` +
+        `📂 **Toplam Komut:** \`${komutlar.size}\`\n\n` +
+        `--- \n\n` +
+        komutListesi
+      )
+      .setThumbnail(message.client.user.displayAvatarURL())
+      .setFooter({ 
+        text: `${message.guild.name} • Güvenli Bot Sistemi`, 
+        iconURL: message.guild.iconURL() 
+      })
+      .setTimestamp();
 
-    const embed = new EmbedBuilder()
-      .setColor(0x5865f2)
-      .setTitle('📖 Komut Listesi')
-      .setDescription(komutlar)
-      .setFooter({ text: `Toplam ${interaction.client.commands.size} komut` });
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('ticket_olustur_yeni')
+        .setLabel('📩 Destek Talebi Oluştur')
+        .setStyle(ButtonStyle.Primary)
+    );
 
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await message.reply({
+      embeds: [dashboardEmbed],
+      components: [row]
+    });
   },
 };

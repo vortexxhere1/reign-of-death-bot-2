@@ -1,4 +1,6 @@
-const { Events, AuditLogEvent, EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder, AuditLogEvent } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 
 const limits = new Map();
 const LIMIT_TIME = 10000;
@@ -9,6 +11,39 @@ module.exports = {
   async execute(member) {
     const guild = member.guild;
     if (!guild) return;
+
+    const dbPath = path.join(__dirname, '../veritabani.json');
+    let channelId = process.env.WELCOME_CHANNEL_ID;
+
+    if (fs.existsSync(dbPath)) {
+      try {
+        const veritabani = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        if (veritabani[guild.id]?.welcomeChannelId) {
+          channelId = veritabani[guild.id].welcomeChannelId;
+        }
+      } catch (err) {
+        console.error('Veritabanı okuma hatası:', err);
+      }
+    }
+
+    try {
+      if (channelId) {
+        const channel = guild.channels.cache.get(channelId);
+        if (channel) {
+          const embed = new EmbedBuilder()
+            .setColor('#ED4245')
+            .setTitle('👋 Biri Aramızdan Ayrıldı')
+            .setDescription(`**${member.user.tag}** sunucudan ayrıldı. Kullanıcı sayısı **${guild.memberCount}** kişiye düştü.`)
+            .setThumbnail(member.user.displayAvatarURL({ size: 256 }))
+            .setFooter({ text: `${guild.name} • Çıkış Sistemi`, iconURL: guild.iconURL() })
+            .setTimestamp();
+
+          await channel.send({ embeds: [embed] });
+        }
+      }
+    } catch (err) {
+      console.error('Çıkış mesajı hatası:', err);
+    }
 
     try {
       const fetchedLogs = await guild.fetchAuditLogs({
@@ -43,8 +78,8 @@ module.exports = {
           const logChannel = guild.channels.cache.get(logChannelId);
           if (logChannel) {
             const embed = new EmbedBuilder()
-              .setTitle('🚨 ANTI-NUKE: KICK/BAN SALDIRISI!')
-              .setDescription(`**Yetkili:** <@${userId}> (${executor.tag})\n**Sebep:** Üst üste üyeleri sunucudan attı.\n**Yapılan İşlem:** Yetkileri alındı.`)
+              .setTitle('🚨 ANTI-NUKE: TOPLU ATMA SALDIRISI!')
+              .setDescription(`**Yetkili:** <@${userId}>\n**Sebep:** Üst üste üyeleri sunucudan attı.\n**İşlem:** Yetkileri alındı.`)
               .setColor('#FF0000')
               .setTimestamp();
 
