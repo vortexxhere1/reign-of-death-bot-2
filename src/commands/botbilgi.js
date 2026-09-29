@@ -16,5 +16,3 @@ module.exports = {
   }
 };
 ```[cite: 10]
-
-Bu kodu `botbilgi.js` dosyasına kaydedip kaydettiğinde VS Code içerisindeki tüm hatalar anında kaybolacaktır.
