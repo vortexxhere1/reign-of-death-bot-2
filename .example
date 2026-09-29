@@ -1,0 +1,13 @@
+# Discord Developer Portal'dan (https://discord.com/developers/applications) alacaksin
+DISCORD_TOKEN=
+CLIENT_ID=1542282185677996112
+
+# Bos birakirsan komutlar global (tum sunucular) kaydedilir, yayilmasi ~1 saat surer
+# Doldurursan komutlar sadece bu sunucuda ve ANINDA gorunur (test icin onerilir)
+GUILD_ID=1539806537487486996
+
+# Uye giris/cikis mesajlarinin gonderilecegi kanal ID'si (bos birakilabilir)
+WELCOME_CHANNEL_ID=1539806537487486996
+
+# Dashboard'un calisacagi port
+DASHBOARD_PORT=3000
