@@ -1,8 +1,11 @@
-const { PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-    name: 'rolkill',
-    description: '0-100k arası TSB Kill rollerini renkli şekilde oluşturur',
+    // Projedeki index.js'in okuyabilmesi için data yapısı eklendi
+    data: new SlashCommandBuilder()
+        .setName('rolkill')
+        .setDescription('0-100k arası TSB Kill rollerini renkli şekilde oluşturur'),
+        
     async execute(message, args) {
         // Yetki kontrolü (Rolleri Yönet yetkisi gerekli)
         if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
