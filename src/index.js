@@ -21,7 +21,7 @@ app.listen(PORT, () => {
     console.log(`🌐 Express sunucusu ${PORT} portunda dinlemede.`);
 });
 
-// Discord Bot Client Tanımlamaları
+// Discord Bot Client Tanımlamaları (GuildVoiceStates eklendi)
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -29,6 +29,7 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildModeration,
+        GatewayIntentBits.GuildVoiceStates, // <-- SES KANALLARI İÇİN ŞART
     ],
 });
 
@@ -68,21 +69,17 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
-    // KESİN DOĞRULAMA KONTROLÜ: 
-    // Eğer kullanıcıda VERIFIED_ROLE_ID yoksa, kurucu/owner hariç hiçbir komut veya mesaj işlemine izin verilmez.
     const verifiedRoleId = process.env.VERIFIED_ROLE_ID;
     const ownerId = process.env.OWNER_ID;
 
     if (verifiedRoleId && message.author.id !== ownerId && message.author.id !== message.guild.ownerId) {
         const member = await message.guild.members.fetch(message.author.id).catch(() => null);
         if (!member || !member.roles.cache.has(verifiedRoleId)) {
-            // Doğrulanmamış üyelerin mesajını anında sil ve işlem yaptırma
             if (message.deletable) await message.delete().catch(() => {});
             return;
         }
     }
 
-    // Bakım modu kontrolü
     if (message.client.bakimModu) {
         if (message.author.id !== ownerId && message.author.id !== message.guild.ownerId) {
             return; 
